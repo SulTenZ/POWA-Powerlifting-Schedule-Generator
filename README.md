@@ -1,7 +1,7 @@
 # 🔥 POWA! - Powerlifting Schedule Generator
 
 <div align="center">
-  <img src="https://img.shields.io/badge/React-19.1.1-61DAFB?style=for-the-badge&logo=react&logoColor=white" alt="React" />
+  <img src="https://img.shields.io/badge/React-19.2.4-61DAFB?style=for-the-badge&logo=react&logoColor=white" alt="React" />
   <img src="https://img.shields.io/badge/Vite-6.0.0-646CFF?style=for-the-badge&logo=vite&logoColor=white" alt="Vite" />
   <img src="https://img.shields.io/badge/Tailwind_CSS-4.0.0-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white" alt="Tailwind CSS" />
 </div>
@@ -34,7 +34,7 @@ The app uses the proven **5/3/1 method** by Jim Wendler, featuring progressive o
 
 ## 🛠️ Tech Stack
 
-- **Framework**: [React 19.1.1](https://react.dev/) - Modern UI library
+- **Framework**: [React 19.2.4](https://react.dev/) - Modern UI library
 - **Build Tool**: [Vite 6.0.0](https://vitejs.dev/) - Lightning-fast development environment
 - **Styling**: [Tailwind CSS 4.0.0](https://tailwindcss.com/) - Utility-first CSS framework
 - **Icons**: [Lucide React](https://lucide.dev/) - Beautiful & consistent icons
