@@ -8,11 +8,10 @@ import { calculateSchedule } from './utils/calculations';
 import { exportScheduleToPDF } from './utils/pdfExport';
 
 export default function App() {
-  // State untuk form input (1RM values)
+  // State untuk form input (single movement 1RM)
   const [formData, setFormData] = useState({
-    squat: '',
-    bench: '',
-    deadlift: ''
+    movement: 'squat',
+    weight: ''
   });
 
   // State untuk menyimpan schedule yang sudah di-generate
@@ -23,31 +22,36 @@ export default function App() {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    if (value === '' || (parseFloat(value) > 0 && !isNaN(value))) {
+    if (name === 'movement' || value === '' || (parseFloat(value) > 0 && !isNaN(value))) {
       setFormData((prev) => ({ ...prev, [name]: value }));
     }
   };
 
   // Generate training schedule berdasarkan input 1RM
   const handleGenerate = () => {
-    const { squat, bench, deadlift } = formData;
+    const { movement, weight } = formData;
 
     // Validasi input
-    if (!squat || !bench || !deadlift) {
-      alert('Mohon isi semua input 1RM!');
+    if (!weight) {
+      alert('Mohon isi input 1RM!');
       return;
     }
 
     // Show loading
     setLoading(true);
 
+    const movementDisplayNames = {
+      squat: 'Squat',
+      bench: 'Bench Press',
+      deadlift: 'Deadlift'
+    };
+
     // Simulate API call dengan setTimeout
     setTimeout(() => {
       const scheduleData = {
-        squat: calculateSchedule(parseFloat(squat), 'Squat'),
-        bench: calculateSchedule(parseFloat(bench), 'Bench Press'),
-        deadlift: calculateSchedule(parseFloat(deadlift), 'Deadlift'),
-        orm: { squat, bench, deadlift }
+        movement: formData.movement,
+        data: calculateSchedule(parseFloat(weight), movementDisplayNames[formData.movement]),
+        orm: weight
       };
 
       setSchedule(scheduleData);
@@ -70,8 +74,8 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 py-8 px-4">
-      <div className="max-w-4xl mx-auto">
+    <div className="relative min-h-screen bg-slate-950 py-12 px-4 selection:bg-yellow-400 selection:text-slate-950">
+      <div className="relative max-w-4xl mx-auto z-10">
         {/* Header */}
         <Header />
 

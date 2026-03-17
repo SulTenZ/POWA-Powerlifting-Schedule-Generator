@@ -9,15 +9,15 @@ export const exportScheduleToPDF = (schedule) => {
     const doc = new jsPDF();
     console.log('jsPDF initialized');
 
-    // === COLOR PALETTE ===
+    // === COLOR PALETTE (Dark Theme) ===
     const colors = {
-      background: [15, 23, 42], 
-      backgroundAlt: [20, 28, 48],
-      cardBg: [30, 41, 59],
-      border: [51, 65, 85],
-      primary: [250, 204, 21],
-      textWhite: [255, 255, 255],
-      textGray: [148, 163, 184],
+      background: [15, 23, 42], // slate-900
+      backgroundAlt: [30, 41, 59], // slate-800
+      cardBg: [15, 23, 42], // slate-900
+      border: [51, 65, 85], // slate-700
+      primary: [250, 204, 21], // yellow-400
+      textPrimary: [255, 255, 255], // white
+      textSecondary: [148, 163, 184], // slate-400
     };
 
     // Helper function untuk draw background di setiap halaman
@@ -28,22 +28,22 @@ export const exportScheduleToPDF = (schedule) => {
 
     // Helper function untuk draw header
     const drawHeader = () => {
-      // POWA! Title
+      // POWA Title
       doc.setFontSize(36);
       doc.setFont('helvetica', 'bold');
-      doc.setTextColor(...colors.textWhite);
-      doc.text('POWA!', 105, 20, { align: 'center' });
+      doc.setTextColor(...colors.primary);
+      doc.text('POWA', 105, 20, { align: 'center' });
 
       // Tagline
       doc.setFontSize(11);
-      doc.setFont('helvetica', 'italic');
-      doc.setTextColor(...colors.textGray);
-      doc.text('Stronger Every Week.', 105, 28, { align: 'center' });
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(...colors.textSecondary);
+      doc.text('Stronger every week.', 105, 28, { align: 'center' });
 
       // Decorative line
-      doc.setDrawColor(...colors.primary);
-      doc.setLineWidth(1.5);
-      doc.line(30, 32, 180, 32);
+      doc.setDrawColor(...colors.border);
+      doc.setLineWidth(0.5);
+      doc.line(20, 32, 190, 32);
     };
 
     // === PAGE 1 - HEADER ===
@@ -52,18 +52,19 @@ export const exportScheduleToPDF = (schedule) => {
 
     // 1RM Info Box
     doc.setFillColor(...colors.cardBg);
-    doc.roundedRect(15, 38, 180, 14, 2, 2, 'F');
+    doc.setDrawColor(...colors.border);
+    doc.roundedRect(15, 38, 180, 14, 2, 2, 'FD');
     
     doc.setFontSize(9);
     doc.setFont('helvetica', 'bold');
-    doc.setTextColor(...colors.primary);
-    doc.text('YOUR 1RM', 20, 44);
+    doc.setTextColor(...colors.textSecondary);
+    doc.text('1RM INFO', 20, 44);
     
-    doc.setFont('helvetica', 'normal');
-    doc.setTextColor(...colors.textWhite);
-    doc.setFontSize(10);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...colors.textPrimary);
+    doc.setFontSize(11);
     doc.text(
-      `Squat: ${schedule.orm.squat}kg  |  Bench Press: ${schedule.orm.bench}kg  |  Deadlift: ${schedule.orm.deadlift}kg`,
+      `${schedule.data[0]?.sets[0] ? schedule.movement.toUpperCase() : 'MOVEMENT'} - ${schedule.orm}kg`,
       20,
       49
     );
@@ -71,110 +72,92 @@ export const exportScheduleToPDF = (schedule) => {
     let yPos = 60;
     let currentPage = 1;
 
-    // === GENERATE TABLES FOR EACH LIFT ===
-    ['squat', 'bench', 'deadlift'].forEach((lift, liftIdx) => {
-      const liftName =
-        lift === 'squat'
-          ? 'SQUAT'
-          : lift === 'bench'
-          ? 'BENCH PRESS'
-          : 'DEADLIFT';
+    // === GENERATE TABLE FOR THE SINGLE LIFT ===
+    const liftName = schedule.movement.toUpperCase();
 
-      // Cek apakah perlu halaman baru
-      if (yPos > 240) {
+    // Lift name header
+    doc.setFontSize(14);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(...colors.primary);
+    doc.text(liftName, 20, yPos + 2);
+    
+    yPos += 8;
+
+    // Generate table untuk setiap minggu
+    schedule.data.forEach((week, weekIdx) => {
+      // Cek jika table akan keluar dari halaman
+      const estimatedTableHeight = 8 + (week.sets.length * 10);
+      if (yPos + estimatedTableHeight > 270) {
         doc.addPage();
         currentPage++;
         drawPageBackground();
         yPos = 20;
       }
 
-      // Lift name header dengan styling card
-      doc.setFillColor(...colors.cardBg);
-      doc.roundedRect(15, yPos - 4, 180, 10, 2, 2, 'F');
-      
-      doc.setFontSize(14);
-      doc.setFont('helvetica', 'bold');
-      doc.setTextColor(...colors.primary);
-      doc.text(liftName, 20, yPos + 2);
-      
-      yPos += 12;
+      const tableData = week.sets.map((set) => [
+        set.setCount > 1 ? `${set.setCount} sets` : '1 set',
+        set.reps,
+        `${set.percentage}%`,
+        `${set.weight} kg`
+      ]);
 
-      // Generate table untuk setiap minggu
-      schedule[lift].forEach((week, weekIdx) => {
-        // Cek jika table akan keluar dari halaman
-        const estimatedTableHeight = 8 + (week.sets.length * 10);
-        if (yPos + estimatedTableHeight > 270) {
-          doc.addPage();
-          currentPage++;
-          drawPageBackground();
-          yPos = 20;
-        }
-
-        const tableData = week.sets.map((set) => [
-          set.setCount > 1 ? `${set.setCount} sets` : '1 set',
-          set.reps,
-          `${set.percentage}%`,
-          `${set.weight} kg`
-        ]);
-
-        autoTable(doc, {
-          startY: yPos,
-          head: [[`Week ${week.week}`, 'Reps', '%', 'Weight']],
-          body: tableData,
-          theme: 'plain',
-          
-          // Header styling
-          headStyles: {
-            fillColor: colors.cardBg,
-            textColor: colors.primary,
+      autoTable(doc, {
+        startY: yPos,
+        head: [[`Week ${week.week}`, 'Reps', '%', 'Weight']],
+        body: tableData,
+        theme: 'plain',
+        
+        // Header styling
+        headStyles: {
+          fillColor: colors.backgroundAlt,
+          textColor: colors.primary,
+          fontStyle: 'bold',
+          fontSize: 10,
+          halign: 'left',
+          cellPadding: { top: 4, bottom: 4, left: 5, right: 5 },
+          lineColor: colors.border,
+          lineWidth: 0.1,
+        },
+        
+        // Body styling
+        bodyStyles: {
+          fillColor: colors.background,
+          textColor: colors.textSecondary,
+          fontSize: 9,
+          cellPadding: { top: 4, bottom: 4, left: 5, right: 5 },
+          lineColor: colors.border,
+          lineWidth: 0.1,
+        },
+        
+        // Alternating row colors
+        alternateRowStyles: {
+          fillColor: colors.backgroundAlt,
+        },
+        
+        // Column styles
+        columnStyles: {
+          0: { cellWidth: 50, halign: 'left' },
+          1: { cellWidth: 45, halign: 'left' },
+          2: { cellWidth: 35, halign: 'left' },
+          3: { 
+            cellWidth: 50,
             fontStyle: 'bold',
-            fontSize: 10,
-            halign: 'left',
-            cellPadding: { top: 3, bottom: 3, left: 5, right: 5 },
-            lineColor: colors.border,
-            lineWidth: 0.3,
+            textColor: colors.textPrimary,
+            halign: 'left'
           },
-          
-          // Body styling
-          bodyStyles: {
-            fillColor: colors.background,
-            textColor: colors.textWhite,
-            fontSize: 9,
-            cellPadding: { top: 3, bottom: 3, left: 5, right: 5 },
-            lineColor: colors.border,
-            lineWidth: 0.3,
-          },
-          
-          // Alternating row colors
-          alternateRowStyles: {
-            fillColor: colors.backgroundAlt,
-          },
-          
-          // Column styles
-          columnStyles: {
-            0: { cellWidth: 50, halign: 'left' },
-            1: { cellWidth: 45, halign: 'left' },
-            2: { cellWidth: 35, halign: 'left' },
-            3: { 
-              cellWidth: 50,
-              fontStyle: 'bold',
-              textColor: colors.primary,
-              halign: 'left'
-            },
-          },
-          
-          margin: { left: 15, right: 15 },
-          
-          // Table outer border
-          tableLineColor: colors.border,
-          tableLineWidth: 0.5,
-        });
-
-        yPos = doc.lastAutoTable.finalY + 8;
+        },
+        
+        margin: { left: 15, right: 15 },
+        
+        // Table outer border
+        tableLineColor: colors.border,
+        tableLineWidth: 0.1,
       });
 
-      yPos += 5;
+      yPos = doc.lastAutoTable.finalY + 8;
     });
+
+    yPos += 5;
 
     // === FOOTER untuk semua halaman ===
     const pageCount = doc.internal.getNumberOfPages();
@@ -189,9 +172,9 @@ export const exportScheduleToPDF = (schedule) => {
       
       // Footer text
       doc.setFontSize(8);
-      doc.setFont('helvetica', 'italic');
-      doc.setTextColor(...colors.textGray);
-      doc.text('Made with POWA! - Stronger Every Week', 105, 285, { align: 'center' });
+      doc.setFont('helvetica', 'normal');
+      doc.setTextColor(...colors.textSecondary);
+      doc.text('Made with POWA - Stronger every week', 105, 285, { align: 'center' });
       
       doc.setFontSize(7);
       doc.text(`Page ${i} of ${pageCount}`, 105, 290, { align: 'center' });
@@ -204,6 +187,6 @@ export const exportScheduleToPDF = (schedule) => {
     return { success: true };
   } catch (error) {
     console.error('PDF Error:', error);
-    return { success: false, error: error.message };
+      return { success: false, error: error?.message || 'Unknown error' };
   }
 };
