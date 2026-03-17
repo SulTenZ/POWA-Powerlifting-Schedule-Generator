@@ -25,10 +25,14 @@ The app uses the proven **5/3/1 method** by Jim Wendler, featuring progressive o
 
 - 📝 **Simple Input**: Enter your 1RM for Squat, Bench Press, and Deadlift
 - 📊 **Auto Calculation**: Automatically generates 3-week training schedules with proper percentages
-- 🎯 **Smart Rounding**: All weights are rounded to the nearest 2.5kg for practical plate loading
+- 🧮 **1RM Estimator**: Not sure about your 1RM? Use the built-in Brzycki formula estimator
+- ⚖️ **Unit Toggle**: Seamlessly switch between **Kilograms (KG)** and **Pounds (LBS)**
+- 💿 **Plate Calculator**: Shows exactly what plates to load on the barbell for each set
+- 💾 **Auto-Save**: Form entries and unit preferences are securely saved to your local storage
+- 🎯 **Smart Rounding**: All target set weights are rounded to the nearest 2.5 for practical plate loading
 - 📄 **PDF Export**: Download your schedule as a professional PDF to take to the gym
 - 📱 **Responsive Design**: Works seamlessly on desktop, tablet, and mobile devices
-- 🎨 **Modern UI**: Clean, bold design with powerlifting vibes
+- 🎨 **Modern UI**: Clean, bold design powered by `framer-motion` animations
 
 ---
 
@@ -37,6 +41,7 @@ The app uses the proven **5/3/1 method** by Jim Wendler, featuring progressive o
 - **Framework**: [React 19.2.4](https://react.dev/) - Modern UI library
 - **Build Tool**: [Vite 6.0.0](https://vitejs.dev/) - Lightning-fast development environment
 - **Styling**: [Tailwind CSS 4.0.0](https://tailwindcss.com/) - Utility-first CSS framework
+- **Animation**: [Framer Motion](https://www.framer.com/motion/) - Smooth, modern UI transitions
 - **Icons**: [Lucide React](https://lucide.dev/) - Beautiful & consistent icons
 - **PDF Generation**: [jsPDF](https://github.com/parallax/jsPDF) + [jsPDF-AutoTable](https://github.com/simonbengtsson/jsPDF-AutoTable)
 
@@ -44,25 +49,28 @@ The app uses the proven **5/3/1 method** by Jim Wendler, featuring progressive o
 
 ## 🎯 Usage
 
-### Step 1: Enter Your 1RM
-Input your one-rep max (1RM) in kilograms for:
+### Step 1: Use the 1RM Estimator (Optional)
+If you don't know your 1-Rep Max, toggle open the 1RM Estimator array, enter a weight and the reps you achieved, and copy the Brzycki formula result.
+
+### Step 2: Enter Your 1RM & Select Unit
+Toggle **KG** or **LBS** at the top. Input your one-rep max in your selected unit for:
 - Squat
 - Bench Press
 - Deadlift
 
-### Step 2: Generate Schedule
+### Step 3: Generate Schedule
 Click the **"Generate Schedule"** button to create your personalized 3-week training program.
 
-### Step 3: Review Your Program
-The app will display a detailed breakdown of:
+### Step 4: Review Your Program & Plates
+The app will display customized cards for each week:
 - **Week 1**: Volume phase (5 reps)
 - **Week 2**: Intensity phase (3 reps)
 - **Week 3**: Peak phase (1 rep)
 
-Each week includes main working sets and accessory work.
+Each set row displays your target weight alongside a **Plate Calculator** badge telling you exactly which plates to load onto one side of a standard barbell.
 
-### Step 4: Export to PDF
-Click **"Download PDF"** to save your schedule and bring it to the gym!
+### Step 5: Export to PDF
+Click **"Download PDF"** to save your structured schedule and bring it to the gym!
 
 ---
 
